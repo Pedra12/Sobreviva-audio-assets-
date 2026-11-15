@@ -1,0 +1,31 @@
+name: Prepare game audio
+on:
+  push:
+    paths:
+      - 'Stormcaller-Lightning-SFX-FREE-Lite.zip'
+      - '.github/workflows/prepare-audio.yml'
+  workflow_dispatch:
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract audio pack
+        run: |
+          mkdir -p extracted
+          unzip -q Stormcaller-Lightning-SFX-FREE-Lite.zip -d extracted
+          echo "Extracted files:"
+          find extracted -type f | sort
+          mkdir -p game-audio
+          find extracted -type f \( -iname '*.ogg' -o -iname 'LICENSE*' -o -iname 'README*' \) -exec cp --parents {} game-audio/ \;
+          test -n "$(find game-audio -type f -iname '*.ogg' -print -quit)"
+      - name: Package audio assets
+        run: |
+          cd game-audio
+          zip -qr ../game-audio-assets.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: game-audio-assets
+          path: game-audio-assets.zip
+          if-no-files-found: error
+          retention-days: 7
