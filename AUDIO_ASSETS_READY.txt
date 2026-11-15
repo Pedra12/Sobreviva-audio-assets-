@@ -1,0 +1,1 @@
+Os efeitos sonoros são preparados automaticamente pelo workflow prepare-audio.yml.
